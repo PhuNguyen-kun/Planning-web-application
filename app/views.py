@@ -1,6 +1,7 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from .models import Homework
+from .forms import HomeworkForm
 
 def home(request):
     return render(request, 'index.html')
@@ -20,7 +21,14 @@ def view_homework(request):
     return render(request, 'view/view-homework.html', context)
 
 def add_homework(request):
-    return render(request, 'view/add-homework.html')
+    if request.method == 'POST':
+        form = HomeworkForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('view_homework')
+    else:
+        form = HomeworkForm()
+    return render(request, 'view/add-homework.html', {'form': form})
 
 def homework_details(request, id):
     homework = get_object_or_404(Homework, id=id)
